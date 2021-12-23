@@ -18,6 +18,11 @@ bool contains(DynamicType::Tag lhs, DynamicType::Tag rhs) {
 }
 } // namespace
 
+#define DYNAMIC_TYPE_TAG_VALUE(NAME, _) \
+constexpr DynamicType::Tag DynamicTypeTrait<NAME##Type>::tagValue;
+FORALL_DYNAMIC_TYPES(DYNAMIC_TYPE_TAG_VALUE)
+#undef DYNAMIC_TYPE_TAG_VALUE
+
 std::string DynamicType::str() const {
   std::string ret = "Dynamic<";
   ret += std::to_string(static_cast<DynamicTypeBits>(tag_));
@@ -167,6 +172,11 @@ bool DynamicType::isSubtypeOfExt(const Type& rhs, std::ostream*) const {
   return false;
 }
 
+TypePtr DynamicType::containedType(size_t i) const {
+  TORCH_INTERNAL_ASSERT(tag_ != Tag::Class);
+  return arguments_.elems.at(i).ty;
+}
+
 bool DynamicType::LabeledDynamicType::isSubtypeOf(
     const LabeledDynamicType& other) const {
   if (!other.label || (label == other.label)) {
@@ -199,7 +209,9 @@ DynamicType::Ptr IValue::TagType<c10::DynamicType>::get(const c10::IValue& v) {
       return StringType::get();
     case Tag::GenericDict: {
       auto d = v.toGenericDict();
-      return DictType::create(d.keyType(), d.valueType());
+      return std::make_shared<DynamicType>(
+          DynamicType::Tag::Dict,
+          DynamicType::Arguments({d.keyType(), d.valueType()}));
     }
     case Tag::GenericList:
       return ListType::create(v.toList().elementType());
