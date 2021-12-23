@@ -7,16 +7,8 @@
 #include <torch/csrc/jit/frontend/parser_constants.h>
 #include <torch/csrc/jit/frontend/type_factory.h>
 #include <torch/csrc/jit/mobile/runtime_compatibility.h>
-#include <torch/csrc/jit/mobile/type_parser.h>
 #include <torch/custom_class.h>
 
-namespace torch {
-namespace jit {
-const std::unordered_map<std::string, c10::TypePtr>& string_to_type_lut();
-} // namespace jit
-} // namespace torch
-
-using torch::jit::string_to_type_lut;
 using torch::jit::valid_single_char_tokens;
 
 namespace c10 {
@@ -139,8 +131,9 @@ TypePtr TypeParser::parseNonSimple(const std::string& token) {
 
 TypePtr TypeParser::parse() {
   std::string token = next();
-  auto simpleTypeIt = string_to_type_lut().find(token);
-  if (simpleTypeIt != string_to_type_lut().end()) {
+  const auto& baseTypes = TypeFactory::basePythonTypes();
+  auto simpleTypeIt = baseTypes.find(token);
+  if (simpleTypeIt != baseTypes.end()) {
     if (cur() != "]" && cur() != "," && cur() != "") {
       TORCH_CHECK(
           false, "Simple type ", token, " is followed by ", "invalid chars.");
@@ -356,4 +349,5 @@ TORCH_API std::vector<at::TypePtr> parseType(
   at::TypeParser parser(pythonStrs);
   return parser.parseList();
 }
+
 } // namespace c10

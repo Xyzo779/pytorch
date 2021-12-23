@@ -109,7 +109,7 @@ core_sources_common = [
     "torch/csrc/autograd/autograd_meta.cpp",
     "torch/csrc/autograd/forward_grad.cpp",
     "torch/csrc/jit/frontend/edit_distance.cpp",
-    "torch/csrc/jit/frontend/string_to_type.cpp",
+    "torch/csrc/jit/frontend/type_factory.cpp",
     "torch/csrc/jit/mobile/type_parser.cpp",
     "torch/csrc/jit/mobile/runtime_compatibility.cpp",
     "torch/csrc/jit/runtime/instruction.cpp",

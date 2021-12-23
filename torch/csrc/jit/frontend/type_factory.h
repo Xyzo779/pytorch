@@ -31,6 +31,7 @@ struct TORCH_API TypeFactory<c10::DynamicType> {
         name,
         c10::DynamicType::Arguments(fields, types));
   }
+  static const std::unordered_map<std::string, c10::TypePtr>& basePythonTypes();
 };
 
 template <>
@@ -48,6 +49,7 @@ struct TORCH_API TypeFactory<c10::Type> {
       const std::vector<c10::TypePtr>& types) {
     return c10::TupleType::createNamed(name, fields, types);
   }
+  static const std::unordered_map<std::string, c10::TypePtr>& basePythonTypes();
 };
 
 } // namespace jit
